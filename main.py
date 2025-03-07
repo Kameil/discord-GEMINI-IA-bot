@@ -25,7 +25,7 @@ voce ira receber mensagens assim: informacoes: mensagem de "nome do usuario": "c
 Voce deve responder o conteudo da mensagem.
 """
 
-model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=SYSTEM_INSTRUCTION)
+model = genai.GenerativeModel("gemini-2.0-flash", system_instruction=SYSTEM_INSTRUCTION)
 
 generation_config = genai.GenerationConfig(
     max_output_tokens=1000,
