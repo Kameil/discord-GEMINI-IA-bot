@@ -11,6 +11,8 @@ import base64
 import asyncio
 from tamga import Tamga
 import datetime
+from pdf2image import convert_from_bytes
+from io import BytesIO
 
 logger = Tamga()
 
@@ -69,6 +71,21 @@ async def on_message(message: discord.Message):
                                     response = await client.get(attachment.url)
                                     image = base64.b64encode(response.content).decode("utf-8")
                                     images.append({'mime_type': attachment.content_type, 'data': image})
+                                if attachment.content_type == "application/pdf":
+                                     async with httpx.AsyncClient() as client:
+                                        for attachment in message.attachments:
+                                            response = await client.get(attachment.url)
+                                            response.raise_for_status()
+
+                                            images = convert_from_bytes(response.content)
+                                            images[0].show()
+
+                                            for image in images:
+                                                image_buffer = BytesIO()
+                                                image.save(image_buffer, format="PNG")
+                                                b64_encoded = base64.b64encode(image_buffer.getvalue()).decode('utf-8')
+                                                images.append({'mime_type': 'image/png', 'data': b64_encoded})
+                                    
 
                     if images:
                         prompt = images + [prompt]
