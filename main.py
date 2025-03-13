@@ -14,6 +14,7 @@ import datetime
 import fitz
 from PIL import Image
 from io import BytesIO
+import gc
 
 logger = Tamga()
 
@@ -79,7 +80,8 @@ async def on_message(message: discord.Message):
                                             response.raise_for_status()
 
                                             pdf_document = fitz.open(stream=response.content, filetype="pdf")
-                                            for page in pdf_document:
+                                            for i in range(len(pdf_document)):
+                                                page = pdf_document[i]
                                                 pixmap = page.get_pixmap()
                                                 # usando o PIllow para fazer essses paranaue ai
                                                 img = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
@@ -88,6 +90,9 @@ async def on_message(message: discord.Message):
                                                 img.save(img_buffer, format="PNG")
                                                 b64_encoded = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
                                                 images.append({'mime_type': 'image/png', 'data': b64_encoded})
+                                                del img, img_buffer, pixmap, page
+                                                gc.collect()
+                                            pdf_document.close()
                                     
 
                     if images:
