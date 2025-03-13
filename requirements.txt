@@ -2,4 +2,4 @@ google-generativeai
 discord
 httpx
 tamga
-pypdf
+pymupdf

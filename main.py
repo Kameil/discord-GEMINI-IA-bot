@@ -11,7 +11,8 @@ import base64
 import asyncio
 from tamga import Tamga
 import datetime
-from pdf2image import convert_from_bytes
+import fitz
+from PIL import Image
 from io import BytesIO
 
 logger = Tamga()
@@ -77,13 +78,15 @@ async def on_message(message: discord.Message):
                                             response = await client.get(attachment.url)
                                             response.raise_for_status()
 
-                                            images = convert_from_bytes(response.content)
-                                            images[0].show()
+                                            pdf_document = fitz.open(stream=response.content, filetype="pdf")
+                                            for page in pdf_document:
+                                                pixmap = page.get_pixmap()
+                                                # usando o PIllow para fazer essses paranaue ai
+                                                img = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
 
-                                            for image in images:
-                                                image_buffer = BytesIO()
-                                                image.save(image_buffer, format="PNG")
-                                                b64_encoded = base64.b64encode(image_buffer.getvalue()).decode('utf-8')
+                                                img_buffer = BytesIO()
+                                                img.save(img_buffer, format="PNG")
+                                                b64_encoded = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
                                                 images.append({'mime_type': 'image/png', 'data': b64_encoded})
                                     
 
