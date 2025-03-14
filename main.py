@@ -91,6 +91,7 @@ async def on_message(message: discord.Message):
                                                 b64_encoded = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
                                                 images.append({'mime_type': 'image/png', 'data': b64_encoded})
                                                 del img, img_buffer, pixmap, page
+                                                await asyncio.sleep(0.2)
                                                 gc.collect()
                                             pdf_document.close()
                                     
